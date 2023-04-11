@@ -78,7 +78,7 @@ const PrRecorder = () => {
             Deadlift
           </MenuItem>
           <MenuItem key={4} value={"OHP"}>
-            OHP
+            Overhead press
           </MenuItem>
         </TextField>
         <TextField
