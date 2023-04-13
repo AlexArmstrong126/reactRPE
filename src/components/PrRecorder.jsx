@@ -2,25 +2,12 @@ import React, { useState, useEffect } from "react";
 import {
   TextField,
   Button,
-  Stack,
-  CardHeader,
-  Card,
-  CardContent,
-  CardActions,
-  Collapse,
   Typography,
   MenuItem,
   Box,
-  Tab,
-  Tabs,
-  TableContainer,
-  Table,
-  TableHead,
-  TableBody,
-  TableCell,
-  TableRow,
-  Paper,
+  Modal,
 } from "@mui/material";
+import ReactPlayer from "react-player";
 
 // TODO: Validation for forms
 // TODO: Nicer looking forms
@@ -35,15 +22,55 @@ const PrRecorder = () => {
     Exercise: "Squat",
     Weight: 0,
     Reps: 0,
-    Video: "No video",
+    Video: "",
     Date: "",
   });
   const [records, setRecords] = useState(() => {
     return JSON.parse(localStorage.getItem("PR_Data")) || [];
   });
+  const [selectedModalIndex, setSelectedModalIndex] = useState(0);
+  const [open, setOpen] = useState(false);
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const handleOpen = (index) => {
+    setSelectedModalIndex(index);
+    setOpen(true);
+  };
+  const handleClose = () => setOpen(false);
+  const style = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 400,
+    bgcolor: "background.paper",
+    border: "2px solid #000",
+    boxShadow: 24,
+    p: 4,
+    borderRadius: "30px",
+  };
 
   useEffect(() => {
     localStorage.setItem("PR_Data", JSON.stringify(records));
+    // fetch(`https://api.api-ninjas.com/v1/exercises?type=powerlifting`, {
+    //   method: "GET",
+    //   headers: { "X-Api-Key": "8ZPIrfKzXqBsopZbvfO3zA==YHG7tyL9oNaj03wO" },
+    //   contentType: "application/json",
+    // })
+    //   .then((response) => {
+    //     if (!response.ok) {
+    //       throw new Error(
+    //         `This is an HTTP error: The status is ${response.status}`
+    //       );
+    //     }
+    //     return response.json();
+    //   })
+    //   .then((actualData) => console.log(actualData))
+    //   .catch((err) => {
+    //     console.log(err.message);
+    //   });
   }, [records]);
 
   const shouldAdd = () => {
@@ -205,6 +232,18 @@ const PrRecorder = () => {
             }))
           }
         ></input>
+        <input
+          type="file"
+          id="myfile"
+          name="myfile"
+          value={input.Video}
+          onChange={(e) =>
+            setInput((prevState) => ({
+              ...prevState,
+              Video: e.target.value,
+            }))
+          }
+        ></input>
         <div style={{ padding: "20px" }}>
           {" "}
           <Button
@@ -235,7 +274,12 @@ const PrRecorder = () => {
                   <td>{records.Exercise}</td>
                   <td>{records.Weight}</td>
                   <td>{records.Reps}</td>
-                  <td>{records.Video}</td>
+                  <td>
+                    <Button onClick={() => handleOpen(index)}>
+                      {" "}
+                      {records.Video}
+                    </Button>
+                  </td>
                   <td>{records.Date}</td>
                 </tr>
               );
@@ -243,6 +287,24 @@ const PrRecorder = () => {
           </tbody>
         </table>
       </div>
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <h1>{records[selectedModalIndex].Exercise}</h1>
+          <p>{records[selectedModalIndex].Date}</p>
+          <ReactPlayer
+            url="https://www.youtube.com/watch?v=5t3q7y3-vXE"
+            // url={records[selectedModalIndex].Video}
+            width={400}
+            controls={true}
+          />
+          <Button> Replace</Button>
+        </Box>
+      </Modal>
     </>
   );
 };
