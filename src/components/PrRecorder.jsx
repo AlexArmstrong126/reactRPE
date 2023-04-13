@@ -46,9 +46,90 @@ const PrRecorder = () => {
     localStorage.setItem("PR_Data", JSON.stringify(records));
   }, [records]);
 
+  const shouldAdd = () => {
+    for (let i = 0; i < records.length; i++) {
+      if (input.Exercise === records[i].Exercise) {
+        if (
+          input.Weight === records[i].Weight &&
+          input.Reps === records[i].Reps
+        ) {
+          return false;
+        }
+        if (
+          input.Weight < records[i].Weight &&
+          input.Reps === records[i].Reps
+        ) {
+          return false;
+        }
+        if (
+          input.Weight === records[i].Weight &&
+          input.Reps > records[i].Reps
+        ) {
+          return false;
+        }
+      }
+      if (JSON.stringify(input) === JSON.stringify(records[i])) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const updateRecord = () => {
+    console.clear();
+    let uniquecheck = shouldAdd();
+    const prData = records.map((record) => {
+      // Check if exercise is already there
+      if (input.Exercise === record.Exercise) {
+        // console.log("same exercise");
+        if (input.Weight > record.Weight && input.Reps === record.Reps) {
+          //console.log("KG PR");
+          return {
+            ...record,
+            Weight: input.Weight,
+          };
+        } else if (input.Weight === record.Weight && input.Reps > record.Reps) {
+          // console.log("Rep pr");
+          return {
+            ...record,
+            Reps: input.Reps,
+          };
+        } else {
+          return {
+            ...record,
+          };
+        }
+      } else {
+        return {
+          ...record,
+        };
+      }
+    });
+    console.log(uniquecheck);
+
+    if (JSON.stringify(prData) !== JSON.stringify(records)) {
+      console.log("Updated a PR");
+      let newRecords = prData.filter(
+        (value, index, self) =>
+          index ===
+          self.findIndex(
+            (t) =>
+              t.Exercise === value.Exercise &&
+              t.Weight === value.Weight &&
+              t.Reps === value.Reps
+          )
+      );
+      setRecords(newRecords);
+    } else if (uniquecheck) {
+      console.log("added unique");
+      setRecords((prevState) => [...prevState, input]);
+    }
+  };
+
   const submitHandler = (e) => {
     e.preventDefault();
-    setRecords((prevState) => [...prevState, input]);
+    updateRecord();
+    //setRecords((prevState) => [...prevState, input]);
   };
 
   return (

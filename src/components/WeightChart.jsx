@@ -57,7 +57,7 @@ const WeightChart = () => {
 
   useEffect(() => {
     localStorage.setItem("WeightData", JSON.stringify(weightChart));
-    console.log(JSON.parse(localStorage.getItem("WeightData")));
+    //console.log(JSON.parse(localStorage.getItem("WeightData")));
   }, [weightChart]);
 
   const submitHandler = (e) => {
